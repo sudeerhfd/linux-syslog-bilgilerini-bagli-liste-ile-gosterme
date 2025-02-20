@@ -1,0 +1,1 @@
+# linux-syslog-bilgilerini-bagli-liste-ile-gosterme
