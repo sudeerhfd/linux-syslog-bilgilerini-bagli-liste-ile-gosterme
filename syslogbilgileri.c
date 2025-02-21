@@ -3,84 +3,94 @@
 #include <string.h>
 
 // Bağlı liste düğümü için yapı tanımı
-typedef struct SyslogNode {
-    char *log;
-    struct SyslogNode *next;
-} SyslogNode;
+typedef struct GunlukDugum {
+    char *gunluk;
+    struct GunlukDugum *sonraki;
+} GunlukDugum;
 
 // Yeni bir düğüm oluşturma fonksiyonu
-SyslogNode* createNode(char *log) {
-    SyslogNode *newNode = (SyslogNode*)malloc(sizeof(SyslogNode));
-    newNode->log = strdup(log);
-    newNode->next = NULL;
-    return newNode;
+GunlukDugum* dugumOlustur(char *gunluk) {
+    GunlukDugum *yeniDugum = (GunlukDugum*)malloc(sizeof(GunlukDugum));
+    if (yeniDugum == NULL) {
+        perror("Bellek tahsis hatası");
+        exit(EXIT_FAILURE);
+    }
+
+    yeniDugum->gunluk = strdup(gunluk);
+    if (yeniDugum->gunluk == NULL) {
+        free(yeniDugum);
+        perror("Bellek tahsis hatası (gunluk)");
+        exit(EXIT_FAILURE);
+    }
+
+    yeniDugum->sonraki = NULL;
+    return yeniDugum;
 }
 
 // Bağlı listeye düğüm ekleme fonksiyonu
-void appendNode(SyslogNode **head, char *log) {
-    SyslogNode *newNode = createNode(log);
-    if (*head == NULL) {
-        *head = newNode;
+void dugumEkle(GunlukDugum **bas, char *gunluk) {
+    GunlukDugum *yeniDugum = dugumOlustur(gunluk);
+    if (*bas == NULL) {
+        *bas = yeniDugum;
     } else {
-        SyslogNode *temp = *head;
-        while (temp->next != NULL) {
-            temp = temp->next;
+        GunlukDugum *gecici = *bas;
+        while (gecici->sonraki != NULL) {
+            gecici = gecici->sonraki;
         }
-        temp->next = newNode;
+        gecici->sonraki = yeniDugum;
     }
 }
 
 // Bağlı listeyi ekrana yazdırma fonksiyonu
-void printList(SyslogNode *head) {
-    SyslogNode *temp = head;
-    while (temp != NULL) {
-        printf("Log Kaydi: %s\n", temp->log); // Türkçe açıklama
-        temp = temp->next;
+void listeYazdir(GunlukDugum *bas) {
+    GunlukDugum *gecici = bas;
+    while (gecici != NULL) {
+        printf("Günlük Kaydı: %s\n", gecici->gunluk);
+        gecici = gecici->sonraki;
     }
 }
 
 // Bağlı listeyi serbest bırakma fonksiyonu
-void freeList(SyslogNode *head) {
-    SyslogNode *temp;
-    while (head != NULL) {
-        temp = head;
-        head = head->next;
-        free(temp->log);
-        free(temp);
+void listeSerbestBirak(GunlukDugum *bas) {
+    GunlukDugum *gecici;
+    while (bas != NULL) {
+        gecici = bas;
+        bas = bas->sonraki;
+        free(gecici->gunluk);
+        free(gecici);
     }
 }
 
 // Syslog dosyasını okuma ve logları bağlı listeye ekleme fonksiyonu
-void readSyslog(SyslogNode **head, const char *filename) {
-    FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        perror("Syslog dosyasini acma hatasi"); // Hata mesajı Türkçeleştirildi
+void gunlukOku(GunlukDugum **bas, const char *dosyaAdi) {
+    FILE *dosya = fopen(dosyaAdi, "r");
+    if (dosya == NULL) {
+        perror("Günlük dosyasını açma hatası");
         exit(EXIT_FAILURE);
     }
 
-    char line[1024];
-    while (fgets(line, sizeof(line), file) != NULL) {
+    char satir[1024];
+    while (fgets(satir, sizeof(satir), dosya) != NULL) {
         // Satır sonu karakterini kaldır
-        line[strcspn(line, "\n")] = '\0';
-        appendNode(head, line);
+        satir[strcspn(satir, "\n")] = '\0';
+        dugumEkle(bas, satir);
     }
 
-    fclose(file);
+    fclose(dosya);
 }
 
 int main() {
-    SyslogNode *syslogList = NULL;
+    GunlukDugum *gunlukListesi = NULL;
 
     // Syslog dosyasını oku ve logları bağlı listeye ekle
-    readSyslog(&syslogList, "/var/log/syslog");
+    gunlukOku(&gunlukListesi, "/var/log/syslog");
 
     // Bağlı listeyi yazdır
-    printf("Syslog Kayitlari:\n"); 
-    printList(syslogList);
+    printf("Günlük Kayıtları:\n");
+    listeYazdir(gunlukListesi);
 
     // Bağlı listeyi serbest bırak
-    freeList(syslogList);
+    listeSerbestBirak(gunlukListesi);
 
     return 0;
 }
-
