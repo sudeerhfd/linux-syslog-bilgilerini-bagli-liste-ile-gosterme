@@ -12,14 +12,14 @@ typedef struct GunlukDugum {
 GunlukDugum* dugumOlustur(char *gunluk) {
     GunlukDugum *yeniDugum = (GunlukDugum*)malloc(sizeof(GunlukDugum));
     if (yeniDugum == NULL) {
-        perror("Bellek tahsis hatası");
+        perror("Bellek tahsis hatasi");
         exit(EXIT_FAILURE);
     }
 
     yeniDugum->gunluk = strdup(gunluk);
     if (yeniDugum->gunluk == NULL) {
         free(yeniDugum);
-        perror("Bellek tahsis hatası (gunluk)");
+        perror("Bellek tahsis hatasi (gunluk)");
         exit(EXIT_FAILURE);
     }
 
@@ -45,7 +45,7 @@ void dugumEkle(GunlukDugum **bas, char *gunluk) {
 void listeYazdir(GunlukDugum *bas) {
     GunlukDugum *gecici = bas;
     while (gecici != NULL) {
-        printf("Günlük Kaydı: %s\n", gecici->gunluk);
+        printf("Gunluk Kaydi: %s\n", gecici->gunluk);
         gecici = gecici->sonraki;
     }
 }
@@ -65,7 +65,7 @@ void listeSerbestBirak(GunlukDugum *bas) {
 void gunlukOku(GunlukDugum **bas, const char *dosyaAdi) {
     FILE *dosya = fopen(dosyaAdi, "r");
     if (dosya == NULL) {
-        perror("Günlük dosyasını açma hatası");
+        perror("Gunluk dosyasini acma hatasi");
         exit(EXIT_FAILURE);
     }
 
@@ -86,7 +86,7 @@ int main() {
     gunlukOku(&gunlukListesi, "/var/log/syslog");
 
     // Bağlı listeyi yazdır
-    printf("Günlük Kayıtları:\n");
+    printf("Gunluk Kayitlari:\n");
     listeYazdir(gunlukListesi);
 
     // Bağlı listeyi serbest bırak
