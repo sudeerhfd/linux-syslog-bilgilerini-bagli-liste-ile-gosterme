@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Bağlı liste düğümü için yapı tanımı
+// BaÄŸlÄ± liste dÃ¼ÄŸÃ¼mÃ¼ iÃ§in yapÄ± tanÄ±mÄ±
 typedef struct SyslogNode {
     char *log;
     struct SyslogNode *next;
 } SyslogNode;
 
-// Yeni bir düğüm oluşturma fonksiyonu
+// Yeni bir dÃ¼ÄŸÃ¼m oluÅŸturma fonksiyonu
 SyslogNode* createNode(char *log) {
     SyslogNode *newNode = (SyslogNode*)malloc(sizeof(SyslogNode));
     newNode->log = strdup(log);
@@ -16,7 +16,7 @@ SyslogNode* createNode(char *log) {
     return newNode;
 }
 
-// Bağlı listeye düğüm ekleme fonksiyonu
+// BaÄŸlÄ± listeye dÃ¼ÄŸÃ¼m ekleme fonksiyonu
 void appendNode(SyslogNode **head, char *log) {
     SyslogNode *newNode = createNode(log);
     if (*head == NULL) {
@@ -30,16 +30,16 @@ void appendNode(SyslogNode **head, char *log) {
     }
 }
 
-// Bağlı listeyi ekrana yazdırma fonksiyonu
+// BaÄŸlÄ± listeyi ekrana yazdÄ±rma fonksiyonu
 void printList(SyslogNode *head) {
     SyslogNode *temp = head;
     while (temp != NULL) {
-        printf("Log Kaydi: %s\n", temp->log); // Türkçe açıklama
+        printf("Log Kaydi: %s\n", temp->log); // TÃ¼rkÃ§e aÃ§Ä±klama
         temp = temp->next;
     }
 }
 
-// Bağlı listeyi serbest bırakma fonksiyonu
+// BaÄŸlÄ± listeyi serbest bÄ±rakma fonksiyonu
 void freeList(SyslogNode *head) {
     SyslogNode *temp;
     while (head != NULL) {
@@ -50,17 +50,17 @@ void freeList(SyslogNode *head) {
     }
 }
 
-// Syslog dosyasını okuma ve logları bağlı listeye ekleme fonksiyonu
+// Syslog dosyasÄ±nÄ± okuma ve loglarÄ± baÄŸlÄ± listeye ekleme fonksiyonu
 void readSyslog(SyslogNode **head, const char *filename) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        perror("Syslog dosyasini acma hatasi"); // Hata mesajı Türkçeleştirildi
+        perror("Syslog dosyasini acma hatasi"); // Hata mesajÄ± TÃ¼rkÃ§eleÅŸtirildi
         exit(EXIT_FAILURE);
     }
 
     char line[1024];
     while (fgets(line, sizeof(line), file) != NULL) {
-        // Satır sonu karakterini kaldır
+        // SatÄ±r sonu karakterini kaldÄ±r
         line[strcspn(line, "\n")] = '\0';
         appendNode(head, line);
     }
@@ -71,14 +71,14 @@ void readSyslog(SyslogNode **head, const char *filename) {
 int main() {
     SyslogNode *syslogList = NULL;
 
-    // Syslog dosyasını oku ve logları bağlı listeye ekle
+    // Syslog dosyasÄ±nÄ± oku ve loglarÄ± baÄŸlÄ± listeye ekle
     readSyslog(&syslogList, "/var/log/syslog");
 
-    // Bağlı listeyi yazdır
-    printf("Syslog Kayitlari:\n"); // Türkçe çıktı
+    // BaÄŸlÄ± listeyi yazdÄ±r
+    printf("Syslog Kayitlari:\n"); 
     printList(syslogList);
 
-    // Bağlı listeyi serbest bırak
+    // BaÄŸlÄ± listeyi serbest bÄ±rak
     freeList(syslogList);
 
     return 0;
